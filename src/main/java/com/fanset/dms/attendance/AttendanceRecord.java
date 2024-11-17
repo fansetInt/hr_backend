@@ -22,71 +22,82 @@ public class AttendanceRecord extends BaseEntity {
     private LocalTime signInTime;
     private LocalTime signOutTime;
 
-    public AttendanceRecord(User employee, LocalDate attendanceDate, LocalTime signInTime, LocalTime signOutTime) {
-        this.employee = employee;
-        this.attendanceDate = attendanceDate;
-        this.signInTime = signInTime;
-        this.signOutTime = signOutTime;
-    }
-
-    public AttendanceRecord(User employee, LocalDate attendanceDate, LocalTime signInTime) {
-        this.employee = employee;
-        this.attendanceDate = attendanceDate;
-        this.signInTime = signInTime;
-    }
-
-    public AttendanceRecord(LocalTime signOutTime,  LocalDate attendanceDate, User employee) {
-        this.signOutTime = signOutTime;
-        this.attendanceDate = attendanceDate;
-        this.employee = employee;
-    }
-
-    public AttendanceRecord() {
-    }
-
-
-    public boolean isLate() {
-        return signInTime != null && signInTime.isAfter(LocalTime.of(8, 30));
-    }
-
-
-    // Getters and setters
     public User getEmployee() {
         return employee;
-    }
-
-    public void setEmployee(User employee) {
-        this.employee = employee;
     }
 
     public LocalDate getAttendanceDate() {
         return attendanceDate;
     }
 
-    public void setAttendanceDate(LocalDate attendanceDate) {
-        this.attendanceDate = attendanceDate;
-    }
-
-
-
     public LocalTime getSignInTime() {
         return signInTime;
-    }
-
-    public void setSignInTime(LocalTime signInTime) {
-        this.signInTime = signInTime;
     }
 
     public LocalTime getSignOutTime() {
         return signOutTime;
     }
 
-    public void setSignOutTime(LocalTime signOutTime) {
-        this.signOutTime = signOutTime;
+    public boolean isLateToday() {
+        return isLateToday;
     }
 
+    public boolean isEmployeeMarkedInToday() {
+        return employeeMarkedInToday;
+    }
 
+    public boolean isEmployeeMarkedOutToday() {
+        return employeeMarkedOutToday;
+    }
 
+    private boolean isLateToday = false;
+    private boolean employeeMarkedInToday = false;
+    private boolean employeeMarkedOutToday = false;
+
+    public AttendanceRecord(User employee, LocalDate attendanceDate, LocalTime signInTime, LocalTime signOutTime) {
+        this.employee = employee;
+        this.attendanceDate = attendanceDate;
+        this.signInTime = signInTime;
+        this.signOutTime = signOutTime;
+        updateFlags();
+    }
+
+    public AttendanceRecord(User employee, LocalDate attendanceDate, LocalTime signInTime) {
+        this.employee = employee;
+        this.attendanceDate = attendanceDate;
+        this.signInTime = signInTime;
+        updateFlags();
+    }
+
+    public AttendanceRecord(LocalTime signOutTime, LocalDate attendanceDate, User employee) {
+        this.signOutTime = signOutTime;
+        this.attendanceDate = attendanceDate;
+        this.employee = employee;
+        updateFlags();
+    }
+
+    public AttendanceRecord() {
+    }
+
+    public boolean isLate() {
+        return signInTime != null && signInTime.isAfter(LocalTime.of(8, 30));
+    }
+
+    private void updateFlags() {
+        this.isLateToday = isLate();
+        this.employeeMarkedInToday = signInTime != null;
+        this.employeeMarkedOutToday = signOutTime != null;
+    }
+
+    public void setSignInTime(LocalTime signInTime) {
+        this.signInTime = signInTime;
+        updateFlags();
+    }
+
+    public void setSignOutTime(LocalTime signOutTime) {
+        this.signOutTime = signOutTime;
+        updateFlags();
+    }
 
     @Override
     public int hashCode() {

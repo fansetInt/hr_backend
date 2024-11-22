@@ -2,6 +2,10 @@ package com.fanset.dms.user.service.implementation;
 
 import com.fanset.dms.auth.service.AuthenticationService;
 import com.fanset.dms.auth.service.JwtService;
+import com.fanset.dms.user.Job.JobRecord;
+import com.fanset.dms.user.Job.JobRepository;
+import com.fanset.dms.user.department.DepartmentRecord;
+import com.fanset.dms.user.department.DepartmentRepository;
 import com.fanset.dms.user.dto.AuthenticationResponse;
 import com.fanset.dms.user.dto.ChangePasswordRequestDto;
 import com.fanset.dms.user.dto.UserDto;
@@ -14,8 +18,12 @@ import com.fanset.dms.user.token.enums.TokenType;
 import com.fanset.dms.user.token.model.Token;
 import com.fanset.dms.user.token.repository.TokenRepository;
 import com.fanset.dms.utils.error_handling.ResourceNotFoundException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -26,7 +34,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor // To automatically inject our dependencies
@@ -38,6 +50,8 @@ public class UserServiceImpl implements UserServiceInterface {
     private final TokenRepository tokenRepository;
     private final EmailValidator emailValidator;
     private final AuthenticationService authenticationService;
+    private final DepartmentRepository departmentRepository;
+    private final JobRepository jobRepository;
 
     @Override
     public Page<User> findAllUsers(int pageNumber, int pageSize) {
@@ -87,6 +101,7 @@ public class UserServiceImpl implements UserServiceInterface {
         if (!isValidEmail){
             throw new IllegalStateException("Email not valid");
         }
+
         User user = new User();
         user.setEmail(userDto.email());
         user.setFirstName(userDto.firstName());
@@ -95,6 +110,31 @@ public class UserServiceImpl implements UserServiceInterface {
         user.setPhoneNumber(userDto.phoneNumber());
         user.setPassword(passwordEncoder.encode(userDto.password()));
         user.setRole(userDto.role());
+
+        user.setNationalId(userDto.nationalId());
+        user.setNationality(userDto.nationality());
+        user.setPassportNumber(userDto.passportNumber());
+
+        user.setAddress(userDto.address().address());
+        user.setCity(userDto.address().city());
+        user.setState(userDto.address().state());
+        user.setCountry(userDto.address().country());
+
+        user.setNextOfKeenAddress(userDto.address().nextOfKeenAddress());
+        user.setNextOfKeenCity(userDto.address().nextOfKeenCity());
+        user.setNextOfKeenState(userDto.address().nextOfKeenState());
+        user.setNextOfKeenCountry(userDto.address().nextOfKeenCountry());
+        user.setNextOfKeenPhoneNumber(userDto.address().nextOfKeenPhoneNumber());
+        user.setNextOfKeenRelationship(userDto.address().nextOfKeenRelationship());
+
+        DepartmentRecord departmentRecord = departmentRepository.findByName(userDto.department());
+        JobRecord jobRecord = jobRepository.findByTitle(userDto.jobTitle());
+        user.setDepartment(departmentRecord);
+//        user.(jobRecord);
+
+
+        //contacts information
+
         var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);

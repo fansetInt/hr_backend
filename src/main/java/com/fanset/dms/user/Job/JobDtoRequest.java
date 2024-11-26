@@ -1,6 +1,8 @@
 package com.fanset.dms.user.Job;
 
+import jakarta.validation.constraints.NotNull;
+
 public record JobDtoRequest(
-        String heading
+        @NotNull String heading
 ) {
 }

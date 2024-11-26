@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
@@ -17,13 +20,13 @@ public class JobController {
 
     private final JobService jobService;
 
-    public JobController(JobService jobService) {
+    public JobController( JobService jobService) {
         this.jobService = jobService;
     }
 
     // Create a new job
     @RequestMapping("/create")
-    public ResponseEntity<String> createJob(@Valid JobDtoRequest jobDtoRequest) {
+    public ResponseEntity<String> createJob(@Valid  @RequestBody JobDtoRequest jobDtoRequest) {
         return ResponseEntity.ok(jobService.createJob(jobDtoRequest));
     }
 
@@ -37,6 +40,13 @@ public class JobController {
     @RequestMapping("/delete{jobId}")
     public ResponseEntity<String> deleteJob(@RequestParam Long jobId) {
         return ResponseEntity.ok(jobService.deleteJob(jobId));
+    }
+
+
+
+    @RequestMapping("/all")
+    public ResponseEntity<List<JobRecord>> getAllJobs() {
+        return ResponseEntity.ok(jobService.getAllJobs());
     }
 
 }

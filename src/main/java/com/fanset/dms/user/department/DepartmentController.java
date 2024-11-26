@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,12 +22,13 @@ public class DepartmentController {
     }
 
 
-    //create
+    @PostMapping
     public ResponseEntity<String> create(@Valid @RequestBody DepartmentRequestDto departmentRequestDto){
         return ResponseEntity.ok(departmentService.createDepartment(departmentRequestDto));
     }
     //update
 
+    @PatchMapping
     public ResponseEntity<String> update(@RequestParam Long departmentId,
                                          @Valid DepartmentRequestDto departmentRequestDto){
         return ResponseEntity.ok(departmentService.updateDepartment(departmentId,departmentRequestDto));
@@ -38,6 +36,7 @@ public class DepartmentController {
 
     //get by id
 
+    @GetMapping()
     public ResponseEntity<DepartmentRecord> getById(@RequestParam Long departmentId){
         return departmentService.findById(departmentId)
                .map(ResponseEntity::ok)
@@ -45,6 +44,10 @@ public class DepartmentController {
     }
 
     //get all
+    @GetMapping("/all")
+    public ResponseEntity<List<DepartmentRecord>> getAllDepartments() {
+        return ResponseEntity.ok(departmentService.getAllDepartments());
+    }
     public ResponseEntity<List<DepartmentRecord>> getAll() {
         return ResponseEntity.ok(departmentService.getAllDepartments());
     }

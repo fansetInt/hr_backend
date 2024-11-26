@@ -18,12 +18,8 @@ import com.fanset.dms.user.token.enums.TokenType;
 import com.fanset.dms.user.token.model.Token;
 import com.fanset.dms.user.token.repository.TokenRepository;
 import com.fanset.dms.utils.error_handling.ResourceNotFoundException;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,11 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor // To automatically inject our dependencies
@@ -128,11 +120,24 @@ public class UserServiceImpl implements UserServiceInterface {
         user.setNextOfKeenRelationship(userDto.address().nextOfKeenRelationship());
 
         DepartmentRecord departmentRecord = departmentRepository.findByName(userDto.department());
+        System.out.println(userDto.jobTitle());
+        System.out.println(userDto.jobTitle());
+
         JobRecord jobRecord = jobRepository.findByTitle(userDto.jobTitle());
+        System.out.println("ds  "+jobRecord.toString());
+
+        if(departmentRecord == null){
+            throw new RuntimeException("No department record found");
+        }
+        if(jobRecord == null){
+            throw new RuntimeException("No job record found");
+        }
+        ArrayList<JobRecord> job = new ArrayList<>();
+        job.add(jobRecord);
+        user.setJobRecordSet(job);
         user.setDepartment(departmentRecord);
+
 //        user.(jobRecord);
-
-
         //contacts information
 
         var savedUser = userRepository.save(user);

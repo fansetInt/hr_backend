@@ -1,22 +1,23 @@
 package com.fanset.dms.user.dto;
 import com.fanset.dms.user.enums.Role;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public record UserDto(
-        String firstName,
-        String lastName,
-        String email,
-        String password,
-        LocalDate dateOfBirth,
-        String phoneNumber,
-        Role role,
-        String nationalId,
-        String nationality,
+        @NotNull String firstName,
+        @NotNull String lastName,
+        @NotNull String email,
+        @NotNull String password,
+        @NotNull LocalDate dateOfBirth,
+        @NotNull String phoneNumber,
+        @NotNull Role role,
+        @NotNull String nationalId,
+        @NotNull String nationality,
         String passportNumber,
-        String department,
-        String jobTitle,
-        AddressDto address
+        @NotNull String department,
+        @NotNull String jobTitle,
+        @NotNull AddressDto address
 ) {
 }
 

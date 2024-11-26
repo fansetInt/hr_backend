@@ -6,6 +6,8 @@ import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 public class JobService implements IJobService  {
@@ -31,13 +33,15 @@ public class JobService implements IJobService  {
     @Transactional
     public String createJob(final JobDtoRequest jobDtoRequest){
         // find if already existing job
-        JobRecord existingJob = jobRepository.findByTitle(jobDtoRequest.heading());
-        if (existingJob!=null){
-            throw new IllegalStateException("Job with this title already exists");
-        }
+//        JobRecord existingJob = jobRepository.findByTitle(jobDtoRequest.heading());
+//        if (existingJob!=null){
+//            throw new IllegalStateException("Job with this title already exists");
+//        }
         // create new job record and save it
-        JobRecord jobRecord = new JobRecord(jobDtoRequest.heading());
-        entityManager.persist(jobRecord);
+        JobRecord jobRecord = new JobRecord();
+        jobRecord.setTitle(jobDtoRequest.heading());
+        System.out.println(jobDtoRequest.heading());
+        jobRepository.save(jobRecord);
         return "done";
     }
 
@@ -58,4 +62,8 @@ public class JobService implements IJobService  {
         return jobRepository.getReferenceById(Long.parseLong(jobId));
     }
 
+    @Override
+    public List<JobRecord> getAllJobs() {
+        return jobRepository.findAll();
+    }
 }

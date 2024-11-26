@@ -1,15 +1,17 @@
 package com.fanset.dms.user.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record AddressDto(
         String address,
-        String city,
-        String state,
-        String country,
+        @NotNull String city,
+        @NotNull String state,
+        @NotNull String country,
         String nextOfKeenAddress,
         String nextOfKeenCity,
         String nextOfKeenState,
         String nextOfKeenCountry,
         String nextOfKeenPhoneNumber,
-        String nextOfKeenRelationship
+        @NotNull String nextOfKeenRelationship
 ) {
 }

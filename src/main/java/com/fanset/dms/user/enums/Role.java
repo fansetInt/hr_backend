@@ -96,7 +96,14 @@ public enum Role {
                     SALES_CREATE
             )
     ),
-    ;
+    MANAGER(
+            Set.of(
+                    SALES_READ,
+                    SALES_UPDATE,
+                    SALES_DELETE,
+                    SALES_CREATE
+            )
+    );
     @Getter
     private final Set<Permission> permissions;
 

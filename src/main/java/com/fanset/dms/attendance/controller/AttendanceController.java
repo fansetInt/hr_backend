@@ -1,8 +1,14 @@
-package com.fanset.dms.attendance;
+package com.fanset.dms.attendance.controller;
 
 
+import com.fanset.dms.attendance.model.AttendanceRecord;
+import com.fanset.dms.attendance.service.impl.AttendanceService;
+import com.fanset.dms.user.model.User;
+import com.fanset.dms.utils.CurrentUserUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,12 +24,11 @@ public class AttendanceController {
     public AttendanceController(AttendanceService attendanceService) {
         this.attendanceService = attendanceService;
     }
-
     // Sign-in endpoint
     @PostMapping("/signIn")
     @PreAuthorize("hasAnyRole('ADMIN', 'CRM', 'FINANCE', 'TECHNICIAN', 'TECHSUPPORT', 'SUPERVISOR')")
     public ResponseEntity<String > signIn(@RequestParam Long userId) {
-        String success =attendanceService.signIn(userId);
+        String success =attendanceService.signIn(CurrentUserUtil.getCurrentUser());
         return ResponseEntity.ok(success);
     }
 
@@ -31,7 +36,9 @@ public class AttendanceController {
     @PostMapping("/signOut")
     @PreAuthorize("hasAnyRole('ADMIN', 'CRM', 'FINANCE', 'TECHNICIAN', 'TECHSUPPORT', 'SUPERVISOR')")
     public ResponseEntity<String>  signOut(@RequestParam Long userId) {
-        String success = attendanceService.signOut(userId);
+
+//        Authentication authentication = SecurityContemm
+        String success = attendanceService.signOut(CurrentUserUtil.getCurrentUser());
         return ResponseEntity.ok(success);
     }
 

@@ -26,6 +26,9 @@ public class ApplicationAuditAware implements AuditorAware<String> {
         }
         User userPrincipal = (User) authentication.getPrincipal();
 
+
+        //refereence userid
+
         return Optional.of(userPrincipal.getFirstName() + " " + userPrincipal.getLastName());
     }
 }

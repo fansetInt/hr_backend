@@ -1,6 +1,8 @@
 package com.fanset.dms.user.model;
 
 
+//import com.fanset.dms.loan.model.LoanRecord;
+//import com.fanset.dms.payroll.model.Payroll;
 import com.fanset.dms.user.Job.JobRecord;
 import com.fanset.dms.user.department.DepartmentRecord;
 import com.fanset.dms.user.enums.Role;
@@ -64,7 +66,7 @@ public class User implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
     @Column(name = "user_role", nullable = false)
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Role role;
     @Column(name = "password", nullable = false)
     private String password;
@@ -102,11 +104,27 @@ public class User implements UserDetails {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private DepartmentRecord department;
-    @OneToMany
+
+
+//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "user_id") // Use a different name for the foreign key column.
+//    private List<Payroll> payroll;
+
+
+    @OneToMany(fetch = FetchType.EAGER)
     private List<JobRecord> jobRecordSet = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> tokens;
+
+
+    // Optional, for bidirectional mapping
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<LoanRecord> loanRecords;
+
+    //
+
+    private int remainingDays = 0;
 
 
     @JsonIgnore

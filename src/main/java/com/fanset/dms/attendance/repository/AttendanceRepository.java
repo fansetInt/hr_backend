@@ -1,5 +1,6 @@
-package com.fanset.dms.attendance;
+package com.fanset.dms.attendance.repository;
 
+import com.fanset.dms.attendance.model.AttendanceRecord;
 import com.fanset.dms.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

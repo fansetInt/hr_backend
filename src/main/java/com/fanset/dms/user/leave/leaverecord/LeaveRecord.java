@@ -22,7 +22,8 @@ public class LeaveRecord {
     private Double leaveDaysRemaining = 0.0;
     private Double leaveDaysAvailableInAMonth = 1.83;
 
-    private Double maximumAllowedDaysInaMonth = 2.0;
+    private int leaveDays= 0;
+
 
 
     public Long getId() {

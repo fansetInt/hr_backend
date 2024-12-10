@@ -1,6 +1,9 @@
-package com.fanset.dms.attendance;
+package com.fanset.dms.attendance.service.impl;
 
 
+import com.fanset.dms.attendance.model.AttendanceRecord;
+import com.fanset.dms.attendance.repository.AttendanceRepository;
+import com.fanset.dms.attendance.service.IAttendanceService;
 import com.fanset.dms.user.model.User;
 import com.fanset.dms.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -14,15 +17,13 @@ import java.util.List;
 
 //@Transactional(READ_ONLY)
 @Service
-public class AttendanceService {
+public class AttendanceService  implements IAttendanceService {
 
     private final AttendanceRepository attendanceRepository;
-    private final EntityManager entityManager;
     private final UserRepository userRepository;
 
-    public AttendanceService(AttendanceRepository attendanceRepository, EntityManager entityManager, UserRepository userRepository) {
+    public AttendanceService(AttendanceRepository attendanceRepository, UserRepository userRepository) {
         this.attendanceRepository = attendanceRepository;
-        this.entityManager = entityManager;
         this.userRepository = userRepository;
     }
 
@@ -64,9 +65,9 @@ public class AttendanceService {
     @Transactional
     private void saveOrUpdateAttendanceRecord(AttendanceRecord record) {
         if (record.getId() == null) {
-            entityManager.persist(record);
+            attendanceRepository.save(record);
         } else {
-            entityManager.merge(record);
+            attendanceRepository.save(record);
         }
     }
 
@@ -79,8 +80,6 @@ public class AttendanceService {
     public List<AttendanceRecord> getUserAttendanceRecords(Long userId) {
         return attendanceRepository.findAllByUserId(userId);
     }
-
-
     public List<AttendanceRecord> getLateUsers(LocalDate now) {
         return attendanceRepository.findAllLateByDate(now);
     }

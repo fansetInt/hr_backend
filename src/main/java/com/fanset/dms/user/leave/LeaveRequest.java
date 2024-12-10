@@ -1,26 +1,28 @@
 package com.fanset.dms.user.leave;
 
 
+import com.fanset.dms.user.enums.Role;
 import com.fanset.dms.user.leave.aprroval.Approval;
 import com.fanset.dms.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Objects;
 
+@Data
 @Entity
 public class LeaveRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Long id;
-
-
-//    private String leaveType;
-//    private String startDate;
-//    private String endDate;
-//    private String reason;
 
     @ManyToOne
     private User employee;
@@ -31,102 +33,37 @@ public class LeaveRequest {
     private LeaveType leaveType;
     @Enumerated(EnumType.STRING)
     private LeaveStatus status;
-
-    @OneToMany(mappedBy = "leaveRequest", cascade = CascadeType.ALL)
-    private List<Approval> approvals;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private int daystotaldays;
 
 
-    public User getEmployee() {
-        return employee;
-    }
+    private String approval;
+    private LocalDateTime submitedAt;
+    private LocalDateTime updatedAt;
+    private String rejectionReason = "";
 
-    public void setEmployee(User employee) {
-        this.employee = employee;
-    }
+//    @Version
+//    private Long version;
 
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public LeaveType getLeaveType() {
-        return leaveType;
-    }
-
-    public void setLeaveType(LeaveType leaveType) {
+//    @OneToMany(mappedBy = "leaveRequest", cascade = CascadeType.ALL)
+//    private HashMap<Approval,Integer> approvals;
+    public LeaveRequest(@NotNull User employee,
+                        @NotNull LeaveType leaveType,
+                        @NotNull LocalDate localDate,
+                        @NotNull LocalDate localDate1,
+                        int i, String reason) {
+        this.employee =employee;
         this.leaveType = leaveType;
+        this.startDate = localDate;
+        this.endDate = localDate1;
+        this.daystotaldays = i;
+        this.reason = reason;
+        this.status = LeaveStatus.PENDING;
     }
 
-    public LeaveStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(LeaveStatus status) {
-        this.status = status;
-    }
-
-    public List<Approval> getApprovals() {
-        return approvals;
-    }
-
-    public void setApprovals(List<Approval> approvals) {
-        this.approvals = approvals;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LeaveRequest that = (LeaveRequest) o;
-        return Objects.equals(id, that.id) && Objects.equals(employee, that.employee) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate) && Objects.equals(reason, that.reason) && leaveType == that.leaveType && status == that.status && Objects.equals(approvals, that.approvals);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, employee, startDate, endDate, reason, leaveType, status, approvals);
+    public LeaveRequest() {
     }
 
 
-    @Override
-    public String toString() {
-        return "LeaveRequest{" +
-                "id=" + id +
-                ", employee=" + employee +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", reason='" + reason + '\'' +
-                ", leaveType=" + leaveType +
-                ", status=" + status +
-                ", approvals=" + approvals +
-                '}';
-    }
 }
 
 

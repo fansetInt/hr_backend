@@ -16,13 +16,11 @@ public class Approval {
 
     @ManyToOne
     private LeaveRequest leaveRequest;
-
     @ManyToOne
     private User approver;
     @Enumerated(EnumType.STRING)
     private ApprovalStatus status; // PENDING, APPROVED, REJECTED
     private LocalDateTime approvalDate;
-
 
     public Long getId() {
         return id;

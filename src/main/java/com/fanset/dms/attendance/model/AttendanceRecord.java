@@ -1,4 +1,4 @@
-package com.fanset.dms.attendance;
+package com.fanset.dms.attendance.model;
 
 
 import com.fanset.dms.user.model.User;
@@ -6,9 +6,7 @@ import com.fanset.dms.utils.base.BaseEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity

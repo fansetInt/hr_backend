@@ -11,7 +11,6 @@ import java.util.Objects;
 
 @Entity
 public class AttendanceRecord extends BaseEntity {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private User employee;

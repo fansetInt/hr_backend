@@ -4,15 +4,17 @@ import com.fanset.dms.assets.dto.AssetRequestDto;
 import com.fanset.dms.assets.model.Asset;
 import com.fanset.dms.assets.repository.AssetRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
+
 @Service
 public class AssetService implements IAssetService{
 
     private final AssetRepository assetRepository;
 
+    public AssetService(AssetRepository assetRepository) {
+        this.assetRepository = assetRepository;
+    }
 
 
     @Override

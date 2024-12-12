@@ -17,8 +17,8 @@ public class AssetSearchRequest {
     private String type;
     private LocalDate purchaseDateFrom;
     private LocalDate purchaseDateTo;
-    private LocalDateTime lastUpdatedFrom = LocalDateTime.of(2000, 1, 1, 0, 0);;
-    private LocalDateTime lastUpdatedTo = LocalDateTime.now();
+    private LocalDateTime lastUpdatedFrom;
+    private LocalDateTime lastUpdatedTo ;
     private Long createdBy;
     private Long updatedBy;
 

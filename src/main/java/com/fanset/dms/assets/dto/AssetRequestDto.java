@@ -12,6 +12,11 @@ public record AssetRequestDto(
          @NotNull int usefulLife,
          @NotNull Double amountPurchased,
          @NotNull Double depressionCost,
-         @NotNull  Double currentValue
+         @NotNull  Double currentValue,
+         @NotNull String assetType,
+         @NotNull String status,
+         @NotNull Long userId
+
 ) {
+
 }

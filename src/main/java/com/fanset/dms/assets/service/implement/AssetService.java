@@ -4,12 +4,12 @@ import com.fanset.dms.assets.dto.AssetRequestDto;
 import com.fanset.dms.assets.dto.UpdateAssetRequestedDto;
 import com.fanset.dms.assets.model.Asset;
 import com.fanset.dms.assets.repository.AssetRepository;
-import lombok.RequiredArgsConstructor;
+import com.fanset.dms.user.model.User;
+import com.fanset.dms.user.service.implementation.UserServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +25,18 @@ import java.time.LocalDateTime;
 public class AssetService implements IAssetService{
 
     private final AssetRepository assetRepository;
+    private final UserServiceImpl userServiceImpl;
 
-    public AssetService(AssetRepository assetRepository) {
+    public AssetService(AssetRepository assetRepository, UserServiceImpl userServiceImpl) {
         this.assetRepository = assetRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
 
     @Override
-    public String saveAsset(AssetRequestDto assetRequestDto) {
-        System.out.printf("servie :::");
-        assetRepository.save(assetDtoToAssetEntity(assetRequestDto));
+    public String saveAsset(AssetRequestDto assetRequestDto,Long editor) {
+        User editorUser = userServiceImpl.findUserById(editor);
+        assetRepository.save(assetDtoToAssetEntity(assetRequestDto,editorUser));
         return "successfully saved";
     }
 
@@ -46,7 +48,10 @@ public class AssetService implements IAssetService{
 
     @Transactional
     @Override
-    public String updateAsset(Long assetId, UpdateAssetRequestedDto updateAssetRequestedDto) {
+    public String updateAsset(
+            Long assetId,
+            UpdateAssetRequestedDto updateAssetRequestedDto,
+            Long editorId) {
         Asset asset = findById(assetId);
         if (asset == null) {
             throw new RuntimeException("Asset with ID " + assetId + " not found.");
@@ -64,6 +69,8 @@ public class AssetService implements IAssetService{
         updateField(asset::setAmountPurchased, updateAssetRequestedDto.amountPurchased());
         updateField(asset::setDepressionCost, updateAssetRequestedDto.depressionCost());
         updateField(asset::setCurrentValue, updateAssetRequestedDto.currentValue());
+        User user = userServiceImpl.findUserById(editorId);
+        asset.setCreatedBy(user);
 
         assetRepository.save(asset);
         return "Update successful with ID :: " + assetId;
@@ -78,16 +85,13 @@ public class AssetService implements IAssetService{
 
 
 
-    private Asset assetDtoToAssetEntity(UpdateAssetRequestedDto updateAssetRequestedDto) {
-        return null;
-    }
 
     @Override
     public Page<Asset> getAllAsset(int page, int size, String sortBy, String sortDirection,
                                    String searchTerm, String status, String type,
                                    LocalDate purchaseDateFrom, LocalDate purchaseDateTo,
                                    LocalDateTime lastUpdatedFrom, LocalDateTime lastUpdatedTo,
-                                   String createdBy, String updatedBy) {
+                                   Long createdBy, Long updatedBy) {
 
         Pageable pageable = PageRequest.of(
                 page, size,
@@ -101,7 +105,7 @@ public class AssetService implements IAssetService{
     }
 
 
-    private Asset assetDtoToAssetEntity(AssetRequestDto assetRequestDto){
+    private Asset assetDtoToAssetEntity(AssetRequestDto assetRequestDto,User editor) {
         Asset asset = new Asset();
         asset.setName(assetRequestDto.name());
         asset.setSerialNumber(assetRequestDto.serialNumber());
@@ -111,6 +115,29 @@ public class AssetService implements IAssetService{
         asset.setAmountPurchased(assetRequestDto.amountPurchased());
         asset.setDepressionCost(assetRequestDto.depressionCost());
         asset.setCurrentValue(assetRequestDto.currentValue());
+
+
+
+        updateField(asset::setName, assetRequestDto.name());
+        updateField(asset::setSerialNumber, assetRequestDto.serialNumber());
+        updateField(asset::setDateGiven, assetRequestDto.dateGiven());
+        updateField(asset::setYearPurchase, assetRequestDto.yearPurchase());
+        updateField(asset::setUsefulLife, assetRequestDto.usefulLife());
+        updateField(asset::setAmountPurchased, assetRequestDto.amountPurchased());
+        updateField(asset::setDepressionCost, assetRequestDto.depressionCost());
+        updateField(asset::setCurrentValue, assetRequestDto.currentValue());
+
+        updateField(asset::setAssetType, assetRequestDto.assetType());
+        updateField(asset::setStatus, assetRequestDto.status());
+
+
+
+        User employee = userServiceImpl.findUserById(assetRequestDto.userId());
+        if (employee != null){
+            asset.setEmployee(employee);
+        }
+        asset.setUpdatedBy(editor);;
+        asset.setCreatedBy(editor);
         return asset;
 
     }

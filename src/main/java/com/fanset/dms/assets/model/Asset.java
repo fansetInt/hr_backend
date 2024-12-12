@@ -1,13 +1,13 @@
 package com.fanset.dms.assets.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fanset.dms.user.model.User;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 
@@ -32,4 +32,19 @@ public class Asset {
     private Double depressionCost;
     private Double totalDepression = 0.0;
     private Double currentValue;
+
+    private String assetType ;
+    private String status;
+
+    @CreationTimestamp
+    private LocalDate createdAt;
+    @UpdateTimestamp
+    private LocalDate updatedAt;
+    @ManyToOne
+    private User createdBy;
+    @ManyToOne
+    private User updatedBy;
+    @ManyToOne
+    private User employee;
+
 }

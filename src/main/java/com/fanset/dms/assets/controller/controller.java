@@ -6,9 +6,14 @@ import com.fanset.dms.assets.dto.UpdateAssetRequestedDto;
 import com.fanset.dms.assets.model.Asset;
 import com.fanset.dms.assets.service.implement.AssetService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @RestController
@@ -41,4 +46,50 @@ public class controller {
         return ResponseEntity.ok(assetService.updateAsset(assetId,updateAssetRequestedDto));
 
     }
+
+
+
+
+    public ResponseEntity<Page<Asset>> getAllAsset(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) LocalDate purchaseDateFrom,
+            @RequestParam(required = false) LocalDate purchaseDateTo,
+            @RequestParam(required = false) LocalDateTime lastUpdatedFrom,
+            @RequestParam(required = false) LocalDateTime lastUpdatedTo,
+            @RequestParam(required = false) String createdBy,
+            @RequestParam(required = false) String updatedBy
+    ) {
+        // Ensure optional string parameters are set to empty if null
+        searchTerm = (searchTerm == null || searchTerm.isBlank()) ? "" : searchTerm;
+        status = (status == null || status.isBlank()) ? "" : status;
+        type = (type == null || type.isBlank()) ? "" : type;
+        createdBy = (createdBy == null || createdBy.isBlank()) ? "" : createdBy;
+        updatedBy = (updatedBy == null || updatedBy.isBlank()) ? "" : updatedBy;
+
+        // Provide default values for date/time parameters
+        LocalDate defaultDate = LocalDate.of(2000, 1, 1);
+        LocalDateTime defaultDateTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+
+        purchaseDateFrom = (purchaseDateFrom == null) ? defaultDate : purchaseDateFrom;
+        purchaseDateTo = (purchaseDateTo == null) ? LocalDate.now() : purchaseDateTo;
+
+        lastUpdatedFrom = (lastUpdatedFrom == null) ? defaultDateTime : lastUpdatedFrom;
+        lastUpdatedTo = (lastUpdatedTo == null) ? LocalDateTime.now() : lastUpdatedTo;
+
+        // Call the service and return the response
+        return ResponseEntity.ok(
+                assetService.getAllAsset(
+                        pageNumber, pageSize, sortBy, direction, searchTerm, status, type,
+                        purchaseDateFrom, purchaseDateTo, lastUpdatedFrom, lastUpdatedTo, createdBy, updatedBy
+                )
+        );
+    }
+
+
 }

@@ -59,7 +59,6 @@ public class LeaveRequest {
         this.reason = reason;
         this.status = LeaveStatus.PENDING;
     }
-
     public LeaveRequest() {
     }
 

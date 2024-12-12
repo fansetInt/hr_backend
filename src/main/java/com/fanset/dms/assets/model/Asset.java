@@ -32,5 +32,4 @@ public class Asset {
     private Double depressionCost;
     private Double totalDepression = 0.0;
     private Double currentValue;
-
 }

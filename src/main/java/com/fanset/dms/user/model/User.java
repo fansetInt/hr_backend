@@ -110,7 +110,6 @@ public class User implements UserDetails {
 //    @JoinColumn(name = "user_id") // Use a different name for the foreign key column.
 //    private List<Payroll> payroll;
 
-
     @OneToMany(fetch = FetchType.EAGER)
     private List<JobRecord> jobRecordSet = new ArrayList<>();
     @JsonIgnore

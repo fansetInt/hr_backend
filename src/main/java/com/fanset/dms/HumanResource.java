@@ -11,10 +11,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 //Enabling Auditing
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @ComponentScan(basePackages = {"com.fanset.dms"})// Specify the package for the Token entity
-public class DmsApplication {
+public class HumanResource {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DmsApplication.class, args);
+		SpringApplication.run(HumanResource.class, args);
 	}
 
 }

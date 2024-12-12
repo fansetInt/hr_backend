@@ -115,7 +115,6 @@ public class AssetService implements IAssetService{
 
     }
 
-
     private Asset findById(Long asssetId){
         Optional<Asset> assetOptional = assetRepository.findById(asssetId);
         return assetOptional.orElse(null);

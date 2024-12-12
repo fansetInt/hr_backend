@@ -4,11 +4,11 @@ import com.fanset.dms.assets.dto.AssetRequestDto;
 import com.fanset.dms.assets.dto.UpdateAssetRequestedDto;
 import com.fanset.dms.assets.model.Asset;
 import com.fanset.dms.assets.repository.AssetRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 
 @Transactional(readOnly = true)
@@ -33,16 +33,44 @@ public class AssetService implements IAssetService{
     @Transactional
     @Override
     public Asset getAssetById(Long assetId) {
-        Optional<Asset> asset =assetRepository.findById(assetId);
-
-        if(asset.isEmpty()){
-            return null;
-        }
-        return asset.get();
+        return findById(assetId);
     }
 
+    @Transactional
     @Override
     public String updateAsset(Long assetId, UpdateAssetRequestedDto updateAssetRequestedDto) {
+        Asset asset = findById(assetId);
+        if (asset == null) {
+            throw new RuntimeException("Asset with ID " + assetId + " not found.");
+        }
+
+        updateField(asset::setName, updateAssetRequestedDto.name());
+        updateField(asset::setSerialNumber, updateAssetRequestedDto.serialNumber());
+        updateField(asset::setDateGiven, updateAssetRequestedDto.dateGiven());
+        updateField(asset::setYearPurchase, updateAssetRequestedDto.yearPurchase());
+
+        if (updateAssetRequestedDto.usefulLife() > 0) {
+            asset.setUsefulLife(updateAssetRequestedDto.usefulLife());
+        }
+
+        updateField(asset::setAmountPurchased, updateAssetRequestedDto.amountPurchased());
+        updateField(asset::setDepressionCost, updateAssetRequestedDto.depressionCost());
+        updateField(asset::setCurrentValue, updateAssetRequestedDto.currentValue());
+
+        assetRepository.save(asset);
+        return "Update successful with ID :: " + assetId;
+    }
+
+    // Generic helper method for updating fields
+    private <T> void updateField(Consumer<T> setter, T value) {
+        if (value != null ) {
+            setter.accept(value);
+        }
+    }
+
+
+
+    private Asset assetDtoToAssetEntity(UpdateAssetRequestedDto updateAssetRequestedDto) {
         return null;
     }
 
@@ -58,5 +86,11 @@ public class AssetService implements IAssetService{
         asset.setCurrentValue(assetRequestDto.currentValue());
         return asset;
 
+    }
+
+
+    private Asset findById(Long asssetId){
+        Optional<Asset> assetOptional = assetRepository.findById(asssetId);
+        return assetOptional.orElse(null);
     }
 }

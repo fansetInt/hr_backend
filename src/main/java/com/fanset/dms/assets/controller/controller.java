@@ -33,6 +33,7 @@ public class controller {
             @RequestParam Long assetId){
         return ResponseEntity.ok(assetService.getAssetById(assetId));
     }
+    @PutMapping("/update")
     public ResponseEntity<String> updateAsset(
             @RequestParam Long assetId,
             @RequestBody UpdateAssetRequestedDto updateAssetRequestedDto

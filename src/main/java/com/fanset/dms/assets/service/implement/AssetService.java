@@ -3,9 +3,14 @@ package com.fanset.dms.assets.service.implement;
 import com.fanset.dms.assets.dto.AssetRequestDto;
 import com.fanset.dms.assets.dto.UpdateAssetRequestedDto;
 import com.fanset.dms.assets.model.Asset;
+import com.fanset.dms.assets.model.AssetStatus;
+import com.fanset.dms.assets.model.AssetType;
 import com.fanset.dms.assets.repository.AssetRepository;
+import com.fanset.dms.assets.service.IAssetService;
 import com.fanset.dms.user.model.User;
 import com.fanset.dms.user.service.implementation.UserServiceImpl;
+import com.fanset.dms.utils.error_handling.ResourceNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +27,18 @@ import java.time.LocalDateTime;
 
 @Transactional(readOnly = true)
 @Service
-public class AssetService implements IAssetService{
+public class AssetService implements IAssetService {
 
     private final AssetRepository assetRepository;
     private final UserServiceImpl userServiceImpl;
+    private final AssetTypeService assetTypeService;
+    private final AssetStatusService assetStatusService;
 
-    public AssetService(AssetRepository assetRepository, UserServiceImpl userServiceImpl) {
+    public AssetService(AssetRepository assetRepository, UserServiceImpl userServiceImpl, AssetTypeService assetTypeService, AssetStatusService assetStatusService) {
         this.assetRepository = assetRepository;
         this.userServiceImpl = userServiceImpl;
+        this.assetTypeService = assetTypeService;
+        this.assetStatusService = assetStatusService;
     }
 
 
@@ -56,19 +65,13 @@ public class AssetService implements IAssetService{
         if (asset == null) {
             throw new RuntimeException("Asset with ID " + assetId + " not found.");
         }
-
         updateField(asset::setName, updateAssetRequestedDto.name());
         updateField(asset::setSerialNumber, updateAssetRequestedDto.serialNumber());
         updateField(asset::setDateGiven, updateAssetRequestedDto.dateGiven());
-        updateField(asset::setYearPurchase, updateAssetRequestedDto.yearPurchase());
-
         if (updateAssetRequestedDto.usefulLife() > 0) {
             asset.setUsefulLife(updateAssetRequestedDto.usefulLife());
         }
-
         updateField(asset::setAmountPurchased, updateAssetRequestedDto.amountPurchased());
-        updateField(asset::setDepressionCost, updateAssetRequestedDto.depressionCost());
-        updateField(asset::setCurrentValue, updateAssetRequestedDto.currentValue());
         User user = userServiceImpl.findUserById(editorId);
         asset.setCreatedBy(user);
 
@@ -77,12 +80,6 @@ public class AssetService implements IAssetService{
     }
 
     // Generic helper method for updating fields
-    private <T> void updateField(Consumer<T> setter, T value) {
-        if (value != null ) {
-            setter.accept(value);
-        }
-    }
-
 
 
 
@@ -105,37 +102,52 @@ public class AssetService implements IAssetService{
     }
 
 
+
+    @Transactional
+    @Override
+    public Asset assignAssetToUser(Long assetId, Long userId) {
+        Asset asset = findById(assetId);
+        User assignedTo = userServiceImpl.findUserById(userId);
+        if (asset == null) {
+            throw new RuntimeException("Asset with ID " + assetId + " not found.");
+        }
+//        if (asset.getAssignedTo()!= null) {
+//            throw new RuntimeException("Asset with ID " + assetId + " is already assigned to user.");
+//        }
+        asset.setAssignedTo(assignedTo);
+        return assetRepository.save(asset);
+    }
+
+
+
+
+    @Override
+    public String calculateAssetValue(Long assetId) {
+        return "";
+    }
+
+
+    @Transactional
     private Asset assetDtoToAssetEntity(AssetRequestDto assetRequestDto,User editor) {
         Asset asset = new Asset();
-        asset.setName(assetRequestDto.name());
-        asset.setSerialNumber(assetRequestDto.serialNumber());
-        asset.setDateGiven(assetRequestDto.dateGiven());
-        asset.setYearPurchase(assetRequestDto.yearPurchase());
-        asset.setUsefulLife(assetRequestDto.usefulLife());
-        asset.setAmountPurchased(assetRequestDto.amountPurchased());
-        asset.setDepressionCost(assetRequestDto.depressionCost());
-        asset.setCurrentValue(assetRequestDto.currentValue());
-
-
-
         updateField(asset::setName, assetRequestDto.name());
         updateField(asset::setSerialNumber, assetRequestDto.serialNumber());
         updateField(asset::setDateGiven, assetRequestDto.dateGiven());
         updateField(asset::setYearPurchase, assetRequestDto.yearPurchase());
         updateField(asset::setUsefulLife, assetRequestDto.usefulLife());
         updateField(asset::setAmountPurchased, assetRequestDto.amountPurchased());
-        updateField(asset::setDepressionCost, assetRequestDto.depressionCost());
-        updateField(asset::setCurrentValue, assetRequestDto.currentValue());
-
-        updateField(asset::setAssetType, assetRequestDto.assetType());
-        updateField(asset::setStatus, assetRequestDto.status());
-
-
-
         User employee = userServiceImpl.findUserById(assetRequestDto.userId());
         if (employee != null){
-            asset.setEmployee(employee);
+            asset.setAssignedTo(employee);
         }
+        asset.setAssetType(
+                assetTypeService.findById(assetRequestDto.assetTypeId())
+                        .orElseThrow(() -> new ResourceNotFoundException("AssetType not found for ID: " + assetRequestDto.assetTypeId()))
+        );
+        asset.setStatus(
+                assetStatusService.findById(assetRequestDto.statusId())
+                        .orElseThrow(() -> new ResourceNotFoundException("AssetStatus not found for ID: " + assetRequestDto.statusId()))
+        );
         asset.setUpdatedBy(editor);;
         asset.setCreatedBy(editor);
         return asset;
@@ -145,5 +157,12 @@ public class AssetService implements IAssetService{
     private Asset findById(Long asssetId){
         Optional<Asset> assetOptional = assetRepository.findById(asssetId);
         return assetOptional.orElse(null);
+    }
+
+
+    private <T> void updateField(Consumer<T> setter, T value) {
+        if (value != null ) {
+            setter.accept(value);
+        }
     }
 }
